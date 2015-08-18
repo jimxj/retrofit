@@ -26,7 +26,7 @@ final class OkHttpCall<T> implements Call<T> {
   private final OkHttpClient client;
   private final RequestFactory requestFactory;
   private final Converter<T> responseConverter;
-  private final Object[] args;
+  private /**JIM final**/ Object[] args;
 
   private volatile com.squareup.okhttp.Call rawCall;
   private boolean executed; // Guarded by this.
@@ -157,5 +157,17 @@ final class OkHttpCall<T> implements Call<T> {
     if (rawCall != null) {
       rawCall.cancel();
     }
+  }
+
+  /**
+   * Hacking to pass callback in the last arg to Call.enqueue(Callback)
+   */
+  //Added by Jim
+  public Object[] getArgs() {
+    return args;
+  }
+  //Added by Jim
+  public void setArgs(Object[] args) {
+    this.args = args;
   }
 }

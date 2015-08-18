@@ -198,7 +198,12 @@ final class RequestFactoryParser {
     boolean gotUrl = false;
 
     int count = methodParameterAnnotationArrays.length;
-    RequestBuilderAction[] requestBuilderActions = new RequestBuilderAction[count];
+
+    //JIM
+    boolean isLastArgCallback = methodParameterTypes[count - 1] == Callback.class;
+    int actionCount = isLastArgCallback ? count : count - 1;
+
+    RequestBuilderAction[] requestBuilderActions = new RequestBuilderAction[actionCount];
     for (int i = 0; i < count; i++) {
       Type methodParameterType = methodParameterTypes[i];
       Annotation[] methodParameterAnnotations = methodParameterAnnotationArrays[i];
@@ -347,8 +352,11 @@ final class RequestFactoryParser {
         }
       }
 
-      if (requestBuilderActions[i] == null) {
-        throw parameterError(i, "No Retrofit annotation found.");
+      if (i != count - 1
+              && !isLastArgCallback) { //JIM, allow Callback as last arg
+        if (requestBuilderActions[i] == null) {
+          throw parameterError(i, "No Retrofit annotation found.");
+        }
       }
     }
 
