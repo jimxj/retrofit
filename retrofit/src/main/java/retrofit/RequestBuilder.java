@@ -64,6 +64,8 @@ final class RequestBuilder {
     } else if (isMultipart) {
       // Will be set to 'body' in 'build'.
       multipartBuilder = new MultipartBuilder();
+      //JIM : default to form
+      multipartBuilder.type(MultipartBuilder.FORM);
     }
   }
 
