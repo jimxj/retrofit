@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import static retrofit.Utils.closeQuietly;
 
-final class OkHttpCall<T> implements Call<T> {
+public final class OkHttpCall<T> implements Call<T> {
   private final OkHttpClient client;
   private final RequestFactory requestFactory;
   private final Converter<T> responseConverter;
@@ -31,6 +31,9 @@ final class OkHttpCall<T> implements Call<T> {
   private volatile com.squareup.okhttp.Call rawCall;
   private boolean executed; // Guarded by this.
   private volatile boolean canceled;
+
+  //JIM
+  private Request request;
 
   OkHttpCall(OkHttpClient client, RequestFactory requestFactory, Converter<T> responseConverter,
       Object[] args) {
@@ -113,7 +116,7 @@ final class OkHttpCall<T> implements Call<T> {
   }
 
   private com.squareup.okhttp.Call createRawCall() {
-    return client.newCall(requestFactory.create(args));
+    return client.newCall(getRequest());
   }
 
   private Response<T> parseResponse(com.squareup.okhttp.Response rawResponse) throws IOException {
@@ -169,5 +172,12 @@ final class OkHttpCall<T> implements Call<T> {
   //Added by Jim
   public void setArgs(Object[] args) {
     this.args = args;
+  }
+
+  public Request getRequest() {
+    if (null == request) {
+      request = requestFactory.create(args);
+    }
+    return request;
   }
 }
