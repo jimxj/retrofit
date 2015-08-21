@@ -33,15 +33,15 @@ import okio.Buffer;
 import okio.BufferedSource;
 import okio.Source;
 
-final class Utils {
-  static <T> T checkNotNull(T object, String message) {
+public final class Utils {
+  public static <T> T checkNotNull(T object, String message) {
     if (object == null) {
       throw new NullPointerException(message);
     }
     return object;
   }
 
-  static void closeQuietly(Closeable closeable) {
+  public static void closeQuietly(Closeable closeable) {
     if (closeable == null) return;
     try {
       closeable.close();
@@ -50,7 +50,8 @@ final class Utils {
   }
 
 
-  static CallAdapter<?> resolveCallAdapter(List<CallAdapter.Factory> adapterFactories, Type type) {
+  public static CallAdapter<?> resolveCallAdapter(List<CallAdapter.Factory> adapterFactories,
+                                                  Type type) {
     for (int i = 0, count = adapterFactories.size(); i < count; i++) {
       CallAdapter<?> adapter = adapterFactories.get(i).get(type);
       if (adapter != null) {
@@ -67,7 +68,8 @@ final class Utils {
     throw new IllegalArgumentException(builder.toString());
   }
 
-  static Converter<?> resolveConverter(List<Converter.Factory> converterFactories, Type type) {
+  public static Converter<?> resolveConverter(List<Converter.Factory> converterFactories,
+                                              Type type) {
     for (int i = 0, count = converterFactories.size(); i < count; i++) {
       Converter<?> converter = converterFactories.get(i).get(type);
       if (converter != null) {
@@ -88,7 +90,8 @@ final class Utils {
    * Replace a {@link Response} with an identical copy whose body is backed by a
    * {@link Buffer} rather than a {@link Source}.
    */
-  static ResponseBody readBodyToBytesIfNecessary(final ResponseBody body) throws IOException {
+  public static ResponseBody readBodyToBytesIfNecessary(final ResponseBody body)
+          throws IOException {
     if (body == null) {
       return null;
     }
@@ -101,7 +104,7 @@ final class Utils {
     return ResponseBody.create(body.contentType(), body.contentLength(), buffer);
   }
 
-  static <T> void validateServiceClass(Class<T> service) {
+  public static <T> void validateServiceClass(Class<T> service) {
     if (!service.isInterface()) {
       throw new IllegalArgumentException("Only interface baseUrl definitions are supported.");
     }
@@ -187,11 +190,11 @@ final class Utils {
     }
   }
 
-  static RuntimeException methodError(Method method, String message, Object... args) {
+  public static RuntimeException methodError(Method method, String message, Object... args) {
     return methodError(null, method, message, args);
   }
 
-  static RuntimeException methodError(Throwable cause, Method method, String message,
+  public static RuntimeException methodError(Throwable cause, Method method, String message,
       Object... args) {
     message = String.format(message, args);
     IllegalArgumentException e = new IllegalArgumentException(message
@@ -204,7 +207,7 @@ final class Utils {
 
   }
 
-  static Type getCallResponseType(Type returnType) {
+  public static Type getCallResponseType(Type returnType) {
     if (!(returnType instanceof ParameterizedType)) {
       throw new IllegalArgumentException(
           "Call return type must be parameterized as Call<Foo> or Call<? extends Foo>");
