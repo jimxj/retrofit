@@ -96,7 +96,7 @@ final class RequestFactoryParser {
   private void parseMethodAnnotations() {
     for (Annotation annotation : method.getAnnotations()) {
       if (annotation instanceof DELETE) {
-        parseHttpMethodAndPath("DELETE", ((DELETE) annotation).value(), false);
+        parseHttpMethodAndPath("DELETE", ((DELETE) annotation).value(), /**false*/ true); //JIM allow delete has body
       } else if (annotation instanceof GET) {
         parseHttpMethodAndPath("GET", ((GET) annotation).value(), false);
       } else if (annotation instanceof HEAD) {
