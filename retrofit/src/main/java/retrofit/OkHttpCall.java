@@ -48,7 +48,7 @@ public final class OkHttpCall<T> implements Call<T> {
     return new OkHttpCall<>(client, requestFactory, responseConverter, args);
   }
 
-  public void enqueue(final Callback<T> callback) {
+  @Override public void enqueue(final Callback<T> callback) {
     synchronized (this) {
       if (executed) throw new IllegalStateException("Already executed");
       executed = true;

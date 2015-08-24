@@ -13,8 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package retrofit.mock;
+package retrofit;
 
-public interface BehaviorAdapter<T> {
-  T applyBehavior(Behavior behavior, T value);
+import java.lang.reflect.Type;
+import rx.Observable;
+import rx.Single;
+
+final class SingleHelper {
+  static CallAdapter<Object> makeSingle(final CallAdapter<Object> callAdapter) {
+    return new CallAdapter<Object>() {
+      @Override public Type responseType() {
+        return callAdapter.responseType();
+      }
+
+      @Override public Single<?> adapt(Call<Object> call) {
+        Observable<?> observable = (Observable<?>) callAdapter.adapt(call);
+        return observable.toSingle();
+      }
+    };
+  }
 }

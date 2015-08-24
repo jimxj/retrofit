@@ -22,6 +22,7 @@ import com.squareup.okhttp.ResponseBody;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -108,21 +109,25 @@ public final class Retrofit {
 
   /** Create an implementation of the API defined by the {@code service} interface. */
   @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
-  public <T> T create(Class<T> service) {
-    Utils.validateServiceClass(service);
+  public <T> T create(final Class<T> service) {
+    Utils.validateServiceInterface(service);
     return (T) Proxy.newProxyInstance(service.getClassLoader(), new Class<?>[] { service },
-        handler);
-  }
+        new InvocationHandler() {
+          private final Platform platform = Platform.get();
 
-  private final InvocationHandler handler = new InvocationHandler() {
-    @Override public Object invoke(Object proxy, Method method, Object... args) throws Throwable {
-      // If the method is a method from Object then defer to normal invocation.
-      if (method.getDeclaringClass() == Object.class) {
-        return method.invoke(this, args);
-      }
-      return loadMethodHandler(method).invoke(args);
-    }
-  };
+          @Override public Object invoke(Object proxy, Method method, Object... args)
+              throws Throwable {
+            // If the method is a method from Object then defer to normal invocation.
+            if (method.getDeclaringClass() == Object.class) {
+              return method.invoke(this, args);
+            }
+            if (platform.isDefaultMethod(method)) {
+              return platform.invokeDefaultMethod(method, service, proxy, args);
+            }
+            return loadMethodHandler(method).invoke(args);
+          }
+        });
+  }
 
   MethodHandler<?> loadMethodHandler(Method method) {
     MethodHandler<?> handler;
@@ -202,6 +207,21 @@ public final class Retrofit {
     /** API base URL. */
     public Builder baseUrl(BaseUrl baseUrl) {
       this.baseUrl = checkNotNull(baseUrl, "baseUrl == null");
+      return this;
+    }
+
+    /** Add converter for serialization and deserialization of {@code type}. */
+    public <T> Builder addConverter(final Type type, final Converter<T> converter) {
+      checkNotNull(type, "type == null");
+      checkNotNull(converter, "converter == null");
+      converterFactories.add(new Converter.Factory() {
+        @Override public Converter<?> get(Type candidate) {
+          return candidate.equals(type) ? converter : null;
+        }
+        @Override public String toString() {
+          return "ConverterFactory(type=" + type + ",converter=" + converter + ")";
+        }
+      });
       return this;
     }
 
