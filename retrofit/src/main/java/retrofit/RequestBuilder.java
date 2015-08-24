@@ -15,6 +15,7 @@
  */
 package retrofit;
 
+import com.magnet.DateFormatter;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.HttpUrl;
@@ -25,6 +26,8 @@ import com.squareup.okhttp.RequestBody;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
+
 import okio.BufferedSink;
 
 final class RequestBuilder {
@@ -72,12 +75,18 @@ final class RequestBuilder {
   void setRelativeUrl(String relativeUrl) {
     this.relativeUrl = relativeUrl;
   }
-
-  void addHeader(String name, String value) {
-    if ("Content-Type".equalsIgnoreCase(name)) {
-      mediaType = MediaType.parse(value);
+  //JIM : convert date using formatter instead of toString
+  void addHeader(String name, Object value) {
+    String stringValue = null;
+    if (value instanceof Date) {
+      stringValue = DateFormatter.ISO860_FORMATTER.format((Date) value);
     } else {
-      requestBuilder.addHeader(name, value);
+      stringValue = value.toString();
+    }
+    if ("Content-Type".equalsIgnoreCase(name)) {
+      mediaType = MediaType.parse(stringValue);
+    } else {
+      requestBuilder.addHeader(name, stringValue);
     }
   }
 

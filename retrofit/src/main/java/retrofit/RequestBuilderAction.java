@@ -44,18 +44,18 @@ abstract class RequestBuilderAction {
       if (value instanceof Iterable) {
         for (Object iterableValue : (Iterable<?>) value) {
           if (iterableValue != null) { // Skip null values.
-            builder.addHeader(name, iterableValue.toString());
+            builder.addHeader(name, iterableValue);
           }
         }
       } else if (value.getClass().isArray()) {
         for (int x = 0, arrayLength = Array.getLength(value); x < arrayLength; x++) {
           Object arrayValue = Array.get(value, x);
           if (arrayValue != null) { // Skip null values.
-            builder.addHeader(name, arrayValue.toString());
+            builder.addHeader(name, arrayValue);
           }
         }
       } else {
-        builder.addHeader(name, value.toString());
+        builder.addHeader(name, value);
       }
     }
   }
