@@ -18,6 +18,7 @@ package retrofit;
 import com.squareup.okhttp.MediaType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -207,8 +208,15 @@ final class RequestFactoryParser {
     int count = methodParameterAnnotationArrays.length;
 
     //JIM
-    boolean isLastArgCallback = methodParameterTypes[count - 1] == Callback.class;
-    int actionCount = isLastArgCallback ? count : count - 1;
+    boolean isLastArgCallback = false;
+    int actionCount = 0;
+    if (count > 0) {
+      if (methodParameterTypes[count - 1] instanceof ParameterizedType) {
+        ParameterizedType parameterizedType = (ParameterizedType) methodParameterTypes[count - 1];
+        isLastArgCallback = Callback.class.equals(parameterizedType.getRawType());
+      }
+      actionCount = isLastArgCallback ? count - 1 : count;
+    }
 
     RequestBuilderAction[] requestBuilderActions = new RequestBuilderAction[actionCount];
     for (int i = 0; i < count; i++) {
