@@ -75,7 +75,7 @@ class Platform {
   @IgnoreJRERequirement // Only classloaded and used on Java 8.
   static class Java8 extends Platform {
     @Override boolean isDefaultMethod(Method method) {
-      return method.isDefault();
+      return false; //JIM : method.isDefault();
     }
 
     @Override Object invokeDefaultMethod(Method method, Class<?> declaringClass, Object object,
