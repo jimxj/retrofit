@@ -15,6 +15,8 @@
  */
 package retrofit;
 
+import com.magnet.MagnetServiceException;
+import com.squareup.okhttp.CacheControl;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.ResponseBody;
@@ -91,6 +93,16 @@ public final class OkHttpCall<T> implements Call<T> {
         Response<T> response;
         try {
           response = parseResponse(rawResponse);
+
+          //JIM call failure callback if server returns error
+          if (isErrorResponse(rawResponse.code())) {
+            try {
+              callFailure(new MagnetServiceException(response.errorBody().string(),
+                      rawResponse.code()));
+            } catch (IOException e) {
+
+            }
+          }
         } catch (Throwable e) {
           callFailure(e);
           return;
@@ -128,7 +140,7 @@ public final class OkHttpCall<T> implements Call<T> {
         .build();
 
     int code = rawResponse.code();
-    if (code < 200 || code >= 300) {
+    if (isErrorResponse(code)) {
       try {
         // Buffer the entire body to avoid future I/O.
         ResponseBody bufferedBody = Utils.readBodyToBytesIfNecessary(rawBody);
@@ -175,9 +187,18 @@ public final class OkHttpCall<T> implements Call<T> {
   }
 
   public Request getRequest() {
+    return getRequest(null);
+  }
+  public Request getRequest(CacheControl cacheControl) {
     if (null == request) {
       request = requestFactory.create(args);
     }
+    if (null != cacheControl) {
+      request = request.newBuilder().cacheControl(cacheControl).build();
+    }
     return request;
+  }
+  private boolean isErrorResponse(int responseCode) {
+     return responseCode < 200 || responseCode >= 300;
   }
 }
