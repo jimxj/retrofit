@@ -99,6 +99,7 @@ public final class OkHttpCall<T> implements Call<T> {
             try {
               callFailure(new MagnetServiceException(response.errorBody().string(),
                       rawResponse.code()));
+              return;
             } catch (IOException e) {
 
             }
