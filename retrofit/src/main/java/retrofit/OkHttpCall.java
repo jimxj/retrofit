@@ -92,6 +92,12 @@ public final class OkHttpCall<T> implements Call<T> {
       @Override public void onResponse(com.squareup.okhttp.Response rawResponse) {
         Response<T> response;
         try {
+          //JIM
+          if (null == rawResponse) {
+            // Reliable call failed, ignore the response
+            return;
+          }
+
           response = parseResponse(rawResponse);
 
           //JIM call failure callback if server returns error
