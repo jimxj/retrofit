@@ -60,6 +60,29 @@ abstract class RequestBuilderAction {
     }
   }
 
+  //JIM
+  static final class HeaderMap extends RequestBuilderAction {
+
+    HeaderMap() {
+    }
+
+    @Override void perform(RequestBuilder builder, Object value) {
+      if (value == null) return; // Skip null values.
+
+      Map<?, ?> map = (Map<?, ?>) value;
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+        Object entryKey = entry.getKey();
+        if (entryKey == null) {
+          throw new IllegalArgumentException("Header map contained null key.");
+        }
+        Object entryValue = entry.getValue();
+        if (entryValue != null) { // Skip null values.
+          builder.addHeader(entryKey.toString(), entryValue.toString());
+        }
+      }
+    }
+  }
+
   static final class Path extends RequestBuilderAction {
     private final String name;
     private final boolean encoded;

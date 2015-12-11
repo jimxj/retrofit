@@ -35,6 +35,7 @@ import retrofit.http.GET;
 import retrofit.http.HEAD;
 import retrofit.http.HTTP;
 import retrofit.http.Header;
+import retrofit.http.HeaderMap;
 import retrofit.http.Headers;
 import retrofit.http.Multipart;
 import retrofit.http.PATCH;
@@ -277,6 +278,10 @@ final class RequestFactoryParser {
           } else if (methodParameterAnnotation instanceof Header) {
             Header header = (Header) methodParameterAnnotation;
             action = new RequestBuilderAction.Header(header.value());
+
+          } else if (methodParameterAnnotation instanceof HeaderMap) { //JIM
+            HeaderMap headerMap = (HeaderMap) methodParameterAnnotation;
+            action = new RequestBuilderAction.HeaderMap();
 
           } else if (methodParameterAnnotation instanceof Field) {
             if (!isFormEncoded) {
